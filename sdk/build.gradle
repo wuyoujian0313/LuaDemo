@@ -1,0 +1,73 @@
+plugins {
+    id 'com.android.library'
+}
+
+android {
+    namespace 'com.wm.lua'
+    compileSdk 33
+
+    defaultConfig {
+        minSdk 21
+        targetSdk 33
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        consumerProguardFiles "consumer-rules.pro"
+
+        ndk {
+            abiFilters "armeabi-v7a" , "arm64-v8a", "x86_64"
+//            abiFilters "armeabi-v7a"
+//            abiFilters "arm64-v8a"
+        }
+    }
+
+    buildTypes {
+        debug {
+            buildConfigField "boolean", "DEBUG", "true"
+            minifyEnabled false
+            debuggable true
+            externalNativeBuild {
+                cmake {
+                    cppFlags += "-DDEBUG"
+                    cFlags += "-DDEBUG"
+                }
+            }
+        }
+        release {
+            buildConfigField "boolean", "DEBUG", "false"
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+//        beta {
+//            initWith release
+//            buildConfigField "boolean", "DEBUG", "true"
+//            externalNativeBuild {
+//                cmake {
+//                    cppFlags += "-DDEBUG"
+//                    cFlags += "-DDEBUG"
+//                }
+//            }
+//        }
+    }
+    externalNativeBuild {
+        cmake {
+            path "src/main/cpp/CMakeLists.txt"
+            version "3.18.1"
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    sourceSets{
+        main {
+            jniLibs.srcDirs = ['./src/main/cpp/libs']
+        }
+    }
+}
+
+dependencies {
+    api fileTree(dir: './src/main/cpp/libs', include: ['*.jar','*.aar'])
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'com.google.android.material:material:1.8.0'
+}
