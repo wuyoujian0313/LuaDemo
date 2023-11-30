@@ -61,11 +61,11 @@ set_target_properties(lua_static PROPERTIES IMPORTED_LOCATION ${CMAKE_SOURCE_DIR
 add_library( # Sets the name of the library.
         wmlua_native
 
-        # Sets the library as a shared library.
         SHARED
 
         # Provides a relative path to your source file(s).
         wmLuaDemo.cpp
+        wmTool.cpp
         )
 
 # Searches for a specified prebuilt library and stores the path as a
