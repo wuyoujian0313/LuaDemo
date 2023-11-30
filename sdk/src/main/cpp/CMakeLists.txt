@@ -49,6 +49,10 @@ MESSAGE(${CMAKE_C_FLAGS})
 
 include_directories(lua/)
 
+# 加载静态库
+add_library(lua_static STATIC IMPORTED)
+set_target_properties(lua_static PROPERTIES IMPORTED_LOCATION ${CMAKE_SOURCE_DIR}/libs/${ANDROID_ABI}/liblua_static.a)
+
 # Creates and names a library, sets it as either STATIC
 # or SHARED, and provides the relative paths to its source code.
 # You can define multiple libraries, and CMake builds them for you.
@@ -86,4 +90,4 @@ target_link_libraries( # Specifies the target library.
 
         # Links the target library to the log library
         # included in the NDK.
-        ${log-lib} android)
+        ${log-lib} android lua_static)
