@@ -4,7 +4,44 @@
 
 #include "wmTool.h"
 #include "wmLuaDemo.h"
+#include "lua/lua.hpp"
 
+#ifdef __ANDROID__
+#include <android/log.h>
+#define LOGD(...)  __android_log_print(ANDROID_LOG_DEBUG, "wmluaDemo", __VA_ARGS__)
+#endif
+
+char* wm_strcat(char* dest, const char* src) {
+    char *result = static_cast<char *>(malloc(strlen(dest) + strlen(src) + 1));
+    if (result == NULL) return "";
+
+    strcpy(result, dest);
+    strcat(result, src);
+
+    return result;
+}
+
+int wm_print(lua_State *L) {
+    int n = lua_gettop(L);
+    char *print_s = "";
+    for (int i = 1; i <= n; i++) {
+        size_t l;
+        const char *s = luaL_tolstring(L, i, &l);
+        if (i > 1) {
+            print_s = wm_strcat(print_s,"\t");
+            print_s = wm_strcat(print_s,s);
+        } else {
+            print_s = wm_strcat(print_s,s);
+        }
+    }
+
+    lua_pop(L, n);
+#ifdef __ANDROID__
+    // 采用android日志输出
+    LOGD("%s", print_s);
+#endif
+    return 0;
+}
 
 // 工具方法
 std::string jstring2string(JNIEnv *env, jstring jstr) {

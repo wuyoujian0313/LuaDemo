@@ -8,11 +8,30 @@
 #include "wmTool.h"
 
 
+
+
 // 演示Lua调用C函数 Begin
 int add(int a, int b) {
     return a+b;
 }
 
+// 重写
+//int callC_add(lua_State* L) {
+//    // 先从栈中取出参数，1和2是a和b在栈中的位置
+//    int a = lua_tonumber(L, 1);
+//    int b = lua_tonumber(L, 2);
+//    // 从栈中弹出已经取值的2个变量
+//    lua_pop(L, 2);
+//    // 调用add
+//    int ret = a + b;
+//    // 结果压入栈
+//    // Lua脚本中取的返回值这里push进去的
+//    lua_pushnumber(L, ret);
+//    // 注意，return 1是告知Lua虚拟机返回一个值
+//    return 1;
+//}
+
+// 采用满足签名的函数包装的方式：
 int callC_add(lua_State* L) {
     // 先从栈中取出参数，1和2是a和b在栈中的位置
     int a = lua_tonumber(L, 1);
@@ -68,6 +87,14 @@ void jni_main(JNIEnv *env,jclass nativeClass,jobject context,jstring luaScript) 
     // 加载lua标准库
     luaL_openlibs(L);
 
+#ifdef __ANDROID__
+    // 替换掉Lua库中的print方法
+    lua_register(L,"print",wm_print);
+#endif
+
+    // 注册满足签名的C函数到Lua虚拟机
+    lua_register(L,"c_add",callC_add);
+
     std::string lua = jstring2string(env,luaScript);
 
     // 加载lua脚本
@@ -88,10 +115,6 @@ void jni_main(JNIEnv *env,jclass nativeClass,jobject context,jstring luaScript) 
 
     // 调用Lua脚本的add函数
     int ret = callLua_add(L,1,2);
-
-    // 注册满足签名的C函数到Lua虚拟机
-    lua_register(L,"callC_add",callC_add);
-
 
     // 关闭库
     lua_close(L);

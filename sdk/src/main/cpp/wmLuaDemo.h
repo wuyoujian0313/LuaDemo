@@ -7,6 +7,7 @@
 
 #include <jni.h>
 
+
 void jni_main(JNIEnv *env,jclass nativeClass,jobject context,jstring luaScript);
 
 #endif //LUADEMO_WMLUADEMO_H
